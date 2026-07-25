@@ -4,30 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog | Shiny Engine</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Navigation Bar -->
     <nav>
-        <a href="index.html">Home</a> | 
-        <a href="blog.html">Blog</a>
+        <div class="logo">Shiny Engine</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="blog.html">Blog</a>
+        </div>
     </nav>
-    <hr>
-
-    <!-- Main Content -->
+    
     <main>
-        <h1>Internship Blog</h1>
-        <article>
-            <h2>Day 2: Mastering HTML</h2>
-            <p>Today, I am learning how to structure web pages using HTML elements like nav, main, and footer!</p>
-        </article>
+        <h1>Internship Progress Log</h1>
+        
+        <div class="blog-container">
+            <!-- Card 1 -->
+            <article class="blog-card">
+                <h2>Day 3: Styling with CSS</h2>
+                <p>Today, I added a professional UI to my project. I designed the header, built an interactive form, styled buttons with hover effects, and formatted this layout using CSS cards.</p>
+                <button class="btn btn-secondary">Read More</button>
+            </article>
+            
+            <!-- Card 2 -->
+            <article class="blog-card">
+                <h2>Day 2: HTML Foundation</h2>
+                <p>Yesterday, I laid out the core structure of the web application utilizing semantic tags for standard accessibility.</p>
+                <button class="btn btn-secondary">Read More</button>
+            </article>
+        </div>
     </main>
-    <hr>
-
-    <!-- Footer -->
+    
     <footer>
         <p>&copy; 2026 Nandagopan MS. Built during the Codomax Digital Solutions Internship.</p>
     </footer>
-
 </body>
 </html>

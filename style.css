@@ -145,3 +145,24 @@ footer {
     color: #fff;
     font-size: 0.9rem;
 }
+
+/* JavaScript Validation Messages */
+#form-message {
+    margin-top: 1rem;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+textarea {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #00d2ff;
+}

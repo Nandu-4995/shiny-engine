@@ -18,15 +18,25 @@
     <main>
         <h1>Internship Progress Log</h1>
         
-        <div class="blog-container">
-            <!-- Card 1 -->
+        <!-- NEW: Add Blog Form Section -->
+        <section class="form-section">
+            <h2>Add New Blog</h2>
+            <form id="add-blog-form">
+                <input type="text" id="blog-title" placeholder="Blog Title (minimum 5 characters)">
+                <textarea id="blog-content" placeholder="Write your blog content here..."></textarea>
+                <button type="submit" class="btn">Post Blog</button>
+            </form>
+            <div id="form-message"></div>
+        </section>
+
+        <!-- Existing Blog Cards -->
+        <div class="blog-container" id="blog-container">
             <article class="blog-card">
                 <h2>Day 3: Styling with CSS</h2>
                 <p>Today, I added a professional UI to my project. I designed the header, built an interactive form, styled buttons with hover effects, and formatted this layout using CSS cards.</p>
                 <button class="btn btn-secondary">Read More</button>
             </article>
             
-            <!-- Card 2 -->
             <article class="blog-card">
                 <h2>Day 2: HTML Foundation</h2>
                 <p>Yesterday, I laid out the core structure of the web application utilizing semantic tags for standard accessibility.</p>
@@ -38,5 +48,8 @@
     <footer>
         <p>&copy; 2026 Nandagopan MS. Built during the Codomax Digital Solutions Internship.</p>
     </footer>
+
+    <!-- NEW: Link to JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>

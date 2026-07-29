@@ -4,7 +4,8 @@ const PORT = 3000;
 
 // Middleware: This allows your server to read incoming JSON data from POST requests
 app.use(express.json());
-
+// Serve static frontend files (HTML, CSS, JS) from this folder
+app.use(express.static(__dirname));
 // A temporary in-memory array to act as our "Database" for now
 let blogs = [
     { id: 1, title: 'Day 3: Styling', content: 'Added professional CSS styling.' },

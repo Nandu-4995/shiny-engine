@@ -1,55 +1,66 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // 1. Select the DOM elements
+    // --- DAY 7: FETCH AND DISPLAY BLOGS ON HOME PAGE ---
+    const homeBlogList = document.getElementById("home-blog-list");
+
+    if (homeBlogList) {
+        // Fetch the data from your Express backend
+        fetch('http://localhost:3000/api/blogs')
+            .then(response => response.json())
+            .then(result => {
+                const blogs = result.data; // Target the array inside your JSON
+                
+                // Loop through each blog in the database and create a card for it
+                blogs.forEach(blog => {
+                    const card = document.createElement("article");
+                    card.className = "blog-card";
+                    card.innerHTML = `
+                        <h2>${blog.title}</h2>
+                        <p>${blog.content}</p>
+                        <button class="btn btn-secondary">Read More</button>
+                    `;
+                    homeBlogList.appendChild(card);
+                });
+            })
+            .catch(error => console.error("Error fetching blogs:", error));
+    }
+
+    // --- DAY 4: ADD BLOG FORM VALIDATION (Remains Unchanged) ---
     const blogForm = document.getElementById("add-blog-form");
     const titleInput = document.getElementById("blog-title");
     const contentInput = document.getElementById("blog-content");
     const formMessage = document.getElementById("form-message");
     const blogContainer = document.getElementById("blog-container");
 
-    // 2. Add an event listener to the form submission
     if (blogForm) {
         blogForm.addEventListener("submit", function(event) {
-            
-            // Prevent the page from reloading
             event.preventDefault();
-
-            // Get the values typed by the user
             const title = titleInput.value.trim();
             const content = contentInput.value.trim();
 
-            // 3. Validation Logic
             if (title.length < 5) {
                 formMessage.textContent = "Error: Blog title must be at least 5 characters long.";
                 formMessage.style.color = "red";
-                return; // Stop the function here
+                return;
             }
 
             if (content === "") {
                 formMessage.textContent = "Error: Blog content cannot be empty.";
                 formMessage.style.color = "red";
-                return; // Stop the function here
+                return;
             }
 
-            // 4. Success UI & DOM Manipulation
             formMessage.textContent = "Success: Blog posted!";
             formMessage.style.color = "green";
 
-            // Create a new HTML article element for the new card
             const newCard = document.createElement("article");
             newCard.className = "blog-card";
-            
-            // Insert the validated text into the card
             newCard.innerHTML = `
                 <h2>${title}</h2>
                 <p>${content}</p>
                 <button class="btn btn-secondary">Read More</button>
             `;
-
-            // Prepend puts the new card at the very top of the container!
             blogContainer.prepend(newCard);
-
-            // Clear the form fields for the next entry
             blogForm.reset();
         });
     }

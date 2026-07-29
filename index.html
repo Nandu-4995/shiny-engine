@@ -17,8 +17,13 @@
     
     <main>
         <h1>Welcome to the Home Page</h1>
-        <p>The frontend architecture is now taking shape with a professional UI.</p>
+        <p>These blog posts are being fetched dynamically directly from the Express backend!</p>
         
+        <!-- NEW: Empty container where JS will inject the blogs -->
+        <section class="blog-container" id="home-blog-list">
+            <!-- Blogs will appear here automatically -->
+        </section>
+
         <section class="form-section">
             <h2>Contact Development Team</h2>
             <form>
@@ -32,5 +37,8 @@
     <footer>
         <p>&copy; 2026 Nandagopan MS. Built during the Codomax Digital Solutions Internship.</p>
     </footer>
+
+    <!-- NEW: Link to JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>

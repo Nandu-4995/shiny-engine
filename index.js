@@ -21,34 +21,38 @@ app.post('/api/blogs', (req, res) => {
     if (!newBlog.title || !newBlog.content) {
         return res.status(400).json({ message: 'Error: Title and content are required.' });
     }
-    newBlog.id = blogs.length > 0 ? blogs[blogs.length - 1].id + 1 : 1;
+    // Safely assign a new ID even if some blogs were deleted
+    newBlog.id = blogs.length > 0 ? Math.max(...blogs.map(b => b.id)) + 1 : 1; 
     blogs.push(newBlog);
     res.status(201).json({ message: 'Blog successfully created!', data: newBlog });
 });
 
 // --- 3. PUT ROUTE (Update) ---
 app.put('/api/blogs/:id', (req, res) => {
-    // 1. Grab the ID from the URL parameter
     const blogId = parseInt(req.params.id);
     const updatedData = req.body;
-
-    // 2. Find the index of this blog in our array
     const blogIndex = blogs.findIndex(b => b.id === blogId);
+    
+    if (blogIndex === -1) return res.status(404).json({ message: 'Error: Blog not found.' });
 
-    // 3. If it doesn't exist, return a 404 error
+    if (updatedData.title) blogs[blogIndex].title = updatedData.title;
+    if (updatedData.content) blogs[blogIndex].content = updatedData.content;
+    res.status(200).json({ message: 'Blog successfully updated!', data: blogs[blogIndex] });
+});
+
+// --- 4. DELETE ROUTE (Delete) ---
+app.delete('/api/blogs/:id', (req, res) => {
+    const blogId = parseInt(req.params.id);
+    const blogIndex = blogs.findIndex(b => b.id === blogId);
+    
     if (blogIndex === -1) {
         return res.status(404).json({ message: 'Error: Blog not found.' });
     }
-
-    // 4. Update the data
-    if (updatedData.title) blogs[blogIndex].title = updatedData.title;
-    if (updatedData.content) blogs[blogIndex].content = updatedData.content;
-
-    // 5. Send success response
-    res.status(200).json({
-        message: 'Blog successfully updated!',
-        data: blogs[blogIndex]
-    });
+    
+    // Remove exactly 1 item at the found index
+    blogs.splice(blogIndex, 1); 
+    
+    res.status(200).json({ message: 'Blog successfully deleted!' });
 });
 
 app.listen(PORT, () => {

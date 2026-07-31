@@ -1,12 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- DAY 7 & 8: FETCH, DISPLAY, AND EDIT BLOGS ---
+    // --- DAY 7, 8 & 9: FETCH, DISPLAY, EDIT, AND DELETE BLOGS ---
     const homeBlogList = document.getElementById("home-blog-list");
 
     if (homeBlogList) {
-        // We wrap the fetch in a function so we can re-run it easily after editing
         function loadBlogs() {
-            homeBlogList.innerHTML = ""; // Clear out the old list
+            homeBlogList.innerHTML = ""; 
             
             fetch('http://localhost:3000/api/blogs')
                 .then(response => response.json())
@@ -17,12 +16,13 @@ document.addEventListener("DOMContentLoaded", function() {
                         const card = document.createElement("article");
                         card.className = "blog-card";
                         
-                        // Added an Edit button with a custom color and a data-id attribute
+                        // Added a red Delete button next to the Edit button
                         card.innerHTML = `
                             <h2>${blog.title}</h2>
                             <p>${blog.content}</p>
                             <button class="btn btn-secondary">Read More</button>
                             <button class="btn edit-btn" style="background-color: #00d2ff; color: #1a1a1a; margin-left: 10px;" data-id="${blog.id}">Edit</button>
+                            <button class="btn delete-btn" style="background-color: #ff4d4d; color: white; margin-left: 10px;" data-id="${blog.id}">Delete</button>
                         `;
                         homeBlogList.appendChild(card);
                     });
@@ -30,19 +30,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 .catch(error => console.error("Error fetching blogs:", error));
         }
 
-        // Load blogs when the page first opens
+        // Load blogs on startup
         loadBlogs(); 
 
-        // Listen for clicks on the "Edit" buttons
+        // Listen for button clicks
         homeBlogList.addEventListener("click", function(event) {
+            
+            // --- EDIT LOGIC ---
             if (event.target.classList.contains("edit-btn")) {
                 const blogId = event.target.getAttribute("data-id");
-                
-                // Ask the user for the new information
                 const newTitle = prompt("Enter the updated Blog Title:");
                 const newContent = prompt("Enter the updated Blog Content:");
 
-                // If they provided both, send the PUT request!
                 if (newTitle && newContent) {
                     fetch(`http://localhost:3000/api/blogs/${blogId}`, {
                         method: 'PUT',
@@ -52,10 +51,29 @@ document.addEventListener("DOMContentLoaded", function() {
                     .then(response => response.json())
                     .then(data => {
                         console.log("Update Success:", data);
-                        // Refresh the UI to show the new updated text
                         loadBlogs(); 
                     })
                     .catch(error => console.error("Error updating blog:", error));
+                }
+            }
+
+            // --- DELETE LOGIC ---
+            if (event.target.classList.contains("delete-btn")) {
+                const blogId = event.target.getAttribute("data-id");
+                
+                // Prompt user with a browser confirmation dialog
+                const confirmDelete = confirm("Are you sure you want to permanently delete this blog post?");
+                
+                if (confirmDelete) {
+                    fetch(`http://localhost:3000/api/blogs/${blogId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Delete Success:", data);
+                        loadBlogs(); // Refresh UI to make the deleted card vanish!
+                    })
+                    .catch(error => console.error("Error deleting blog:", error));
                 }
             }
         });

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- DAY 7, 8 & 9: FETCH, DISPLAY, EDIT, AND DELETE BLOGS ---
+    // --- HOME PAGE: FETCH, DISPLAY, EDIT, AND DELETE BLOGS ---
     const homeBlogList = document.getElementById("home-blog-list");
 
     if (homeBlogList) {
@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         const card = document.createElement("article");
                         card.className = "blog-card";
                         
-                        // Added a red Delete button next to the Edit button
                         card.innerHTML = `
                             <h2>${blog.title}</h2>
                             <p>${blog.content}</p>
@@ -30,13 +29,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 .catch(error => console.error("Error fetching blogs:", error));
         }
 
-        // Load blogs on startup
         loadBlogs(); 
 
-        // Listen for button clicks
         homeBlogList.addEventListener("click", function(event) {
-            
-            // --- EDIT LOGIC ---
+            // EDIT
             if (event.target.classList.contains("edit-btn")) {
                 const blogId = event.target.getAttribute("data-id");
                 const newTitle = prompt("Enter the updated Blog Title:");
@@ -48,38 +44,28 @@ document.addEventListener("DOMContentLoaded", function() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ title: newTitle, content: newContent })
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Update Success:", data);
-                        loadBlogs(); 
-                    })
+                    .then(() => loadBlogs())
                     .catch(error => console.error("Error updating blog:", error));
                 }
             }
 
-            // --- DELETE LOGIC ---
+            // DELETE
             if (event.target.classList.contains("delete-btn")) {
                 const blogId = event.target.getAttribute("data-id");
-                
-                // Prompt user with a browser confirmation dialog
                 const confirmDelete = confirm("Are you sure you want to permanently delete this blog post?");
                 
                 if (confirmDelete) {
                     fetch(`http://localhost:3000/api/blogs/${blogId}`, {
                         method: 'DELETE'
                     })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Delete Success:", data);
-                        loadBlogs(); // Refresh UI to make the deleted card vanish!
-                    })
+                    .then(() => loadBlogs())
                     .catch(error => console.error("Error deleting blog:", error));
                 }
             }
         });
     }
 
-    // --- DAY 4: ADD BLOG FORM VALIDATION (Remains Unchanged) ---
+    // --- BLOG PAGE: ADD BLOG FORM (DAY 10 FRONTEND INTEGRATION) ---
     const blogForm = document.getElementById("add-blog-form");
     const titleInput = document.getElementById("blog-title");
     const contentInput = document.getElementById("blog-content");
@@ -92,20 +78,37 @@ document.addEventListener("DOMContentLoaded", function() {
             const title = titleInput.value.trim();
             const content = contentInput.value.trim();
 
+            // 1. Frontend Validation
             if (title.length < 5 || content === "") {
                 formMessage.textContent = "Error: Invalid title or content.";
                 formMessage.style.color = "red";
                 return;
             }
 
-            formMessage.textContent = "Success: Blog posted!";
-            formMessage.style.color = "green";
+            // 2. BACKEND INTEGRATION: Send the data using Fetch POST
+            fetch('http://localhost:3000/api/blogs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title, content: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 3. Success UI updates
+                formMessage.textContent = "Success: Blog permanently saved to the server!";
+                formMessage.style.color = "green";
 
-            const newCard = document.createElement("article");
-            newCard.className = "blog-card";
-            newCard.innerHTML = `<h2>${title}</h2><p>${content}</p><button class="btn btn-secondary">Read More</button>`;
-            blogContainer.prepend(newCard);
-            blogForm.reset();
+                const newCard = document.createElement("article");
+                newCard.className = "blog-card";
+                newCard.innerHTML = `<h2>${data.data.title}</h2><p>${data.data.content}</p><button class="btn btn-secondary">Read More</button>`;
+                
+                blogContainer.prepend(newCard);
+                blogForm.reset();
+            })
+            .catch(error => {
+                console.error("Error posting blog:", error);
+                formMessage.textContent = "Error: Could not connect to the server.";
+                formMessage.style.color = "red";
+            });
         });
     }
 });

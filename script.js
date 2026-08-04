@@ -5,17 +5,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (homeBlogList) {
         function loadBlogs() {
-            homeBlogList.innerHTML = ""; 
+            homeBlogList.innerHTML = "<p>Loading securely...</p>"; // Performance: Show loading state
             
             fetch('http://localhost:3000/api/blogs')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error("Server offline");
+                    return response.json();
+                })
                 .then(result => {
+                    homeBlogList.innerHTML = ""; 
                     const blogs = result.data;
                     
                     blogs.forEach(blog => {
                         const card = document.createElement("article");
                         card.className = "blog-card";
-                        
                         card.innerHTML = `
                             <h2>${blog.title}</h2>
                             <p>${blog.content}</p>
@@ -26,7 +29,17 @@ document.addEventListener("DOMContentLoaded", function() {
                         homeBlogList.appendChild(card);
                     });
                 })
-                .catch(error => console.error("Error fetching blogs:", error));
+                .catch(error => {
+                    // BUG FIX: Graceful UI fallback for static GitHub Pages deployment
+                    console.warn("Backend connection failed. Displaying static fallback.");
+                    homeBlogList.innerHTML = `
+                        <div style="text-align: center; padding: 20px; border: 1px dashed #ff4d4d; border-radius: 8px;">
+                            <h3 style="color: #ff4d4d;">⚠️ Backend Server Offline</h3>
+                            <p>This UI is currently hosted statically via GitHub Pages.</p>
+                            <p>To view dynamic data and test CRUD operations, please clone the repository and run the Node.js server locally.</p>
+                        </div>
+                    `;
+                });
         }
 
         loadBlogs(); 
@@ -45,32 +58,27 @@ document.addEventListener("DOMContentLoaded", function() {
                         body: JSON.stringify({ title: newTitle, content: newContent })
                     })
                     .then(() => loadBlogs())
-                    .catch(error => console.error("Error updating blog:", error));
+                    .catch(() => alert("Cannot edit: Backend server is offline."));
                 }
             }
 
             // DELETE
             if (event.target.classList.contains("delete-btn")) {
                 const blogId = event.target.getAttribute("data-id");
-                const confirmDelete = confirm("Are you sure you want to permanently delete this blog post?");
-                
-                if (confirmDelete) {
-                    fetch(`http://localhost:3000/api/blogs/${blogId}`, {
-                        method: 'DELETE'
-                    })
+                if (confirm("Are you sure you want to permanently delete this blog post?")) {
+                    fetch(`http://localhost:3000/api/blogs/${blogId}`, { method: 'DELETE' })
                     .then(() => loadBlogs())
-                    .catch(error => console.error("Error deleting blog:", error));
+                    .catch(() => alert("Cannot delete: Backend server is offline."));
                 }
             }
         });
     }
 
-    // --- BLOG PAGE: ADD BLOG FORM (DAY 10 FRONTEND INTEGRATION) ---
+    // --- BLOG PAGE: ADD BLOG FORM ---
     const blogForm = document.getElementById("add-blog-form");
     const titleInput = document.getElementById("blog-title");
     const contentInput = document.getElementById("blog-content");
     const formMessage = document.getElementById("form-message");
-    const blogContainer = document.getElementById("blog-container");
 
     if (blogForm) {
         blogForm.addEventListener("submit", function(event) {
@@ -78,35 +86,28 @@ document.addEventListener("DOMContentLoaded", function() {
             const title = titleInput.value.trim();
             const content = contentInput.value.trim();
 
-            // 1. Frontend Validation
             if (title.length < 5 || content === "") {
                 formMessage.textContent = "Error: Invalid title or content.";
                 formMessage.style.color = "red";
                 return;
             }
 
-            // 2. BACKEND INTEGRATION: Send the data using Fetch POST
             fetch('http://localhost:3000/api/blogs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title: title, content: content })
             })
-            .then(response => response.json())
-            .then(data => {
-                // 3. Success UI updates
-                formMessage.textContent = "Success: Blog permanently saved to the server!";
+            .then(response => {
+                if (!response.ok) throw new Error("Server offline");
+                return response.json();
+            })
+            .then(() => {
+                formMessage.textContent = "Success: Blog permanently saved!";
                 formMessage.style.color = "green";
-
-                const newCard = document.createElement("article");
-                newCard.className = "blog-card";
-                newCard.innerHTML = `<h2>${data.data.title}</h2><p>${data.data.content}</p><button class="btn btn-secondary">Read More</button>`;
-                
-                blogContainer.prepend(newCard);
                 blogForm.reset();
             })
-            .catch(error => {
-                console.error("Error posting blog:", error);
-                formMessage.textContent = "Error: Could not connect to the server.";
+            .catch(() => {
+                formMessage.textContent = "Error: Backend offline. Cannot post data from static host.";
                 formMessage.style.color = "red";
             });
         });

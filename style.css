@@ -235,3 +235,33 @@ main h1, main p, .form-section {
     transform: translateY(-8px) scale(1.01);
     box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
 }
+
+@media (max-width: 768px) {
+    /* Stack navigation links vertically on small screens */
+    nav {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .nav-links {
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    /* Reduce main padding to give text more room */
+    main {
+        padding: 20px 15px;
+    }
+
+    /* Stack buttons neatly on mobile */
+    .blog-card .btn {
+        display: block;
+        width: 100%;
+        margin-left: 0 !important;
+        margin-top: 10px;
+    }
+}
